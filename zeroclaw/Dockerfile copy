@@ -1,0 +1,57 @@
+ARG BUILD_FROM
+ARG ZEROCLAW_VERSION="main" # 默认拉取 main 分支的最新代码，也可以写具体的 tag 如 v0.1.0
+
+# ---------------------------------------------------------
+# 阶段 1：构建环境 (Builder)
+# 使用官方 Rust 镜像来编译 ZeroClaw
+# ---------------------------------------------------------
+FROM rust:alpine AS builder
+
+# 安装编译所需的依赖：Alpine 使用 musl，所以需要安装对应的构建工具
+RUN apk add --no-cache musl-dev gcc make pkgconfig openssl-dev
+
+# 将工作目录设为 /app
+WORKDIR /app
+
+# 从 GitHub 直接拉取 ZeroClaw 源码仓库
+# depth=1 可以极大地加快克隆速度，不拉取历史记录
+RUN apk add --no-cache git \
+    && echo "🚀 Cloning ZeroClaw repository..." \
+    && git clone --depth=1 https://github.com/zeroclaw-labs/zeroclaw.git .
+
+# 开始 Rust 编译：使用 release 配置以获得最小、最快的二进制文件
+# 根据官方文档，使用 codegen-units=1 可以在低端板子上获得最佳性能
+RUN echo "⚙️ Building ZeroClaw (this may take a few minutes)..." \
+    && cargo build --profile release-fast --locked
+
+
+# ---------------------------------------------------------
+# 阶段 2：运行环境 (Runner)
+# 这一步将回到 HA 的基础镜像，只复制我们刚才编译好的二进制文件
+# ---------------------------------------------------------
+FROM $BUILD_FROM
+
+# 安装 ZeroClaw 运行时必需的最基础工具
+# jq 和 bash 用于运行 run.sh，curl 用于可能的数据请求，tzdata 用于时区，
+# libc6-compat 依然保留，以防万一某些外部绑定需要。
+RUN apk add --no-cache \
+    bash \
+    curl \
+    jq \
+    tzdata \
+    ca-certificates \
+    libc6-compat
+
+# 从阶段 1 (builder) 的镜像里，把编译好的二进制文件“偷”过来
+# 放在 /usr/bin/zeroclaw 目录下
+COPY --from=builder /app/target/release-fast/zeroclaw /usr/bin/zeroclaw
+
+# 赋予可执行权限
+RUN chmod +x /usr/bin/zeroclaw
+
+# 植入我们的启动脚本
+COPY run.sh /run.sh
+RUN chmod +x /run.sh
+
+# 设定容器入口
+CMD [ "/run.sh" ]

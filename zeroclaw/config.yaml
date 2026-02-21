@@ -1,0 +1,42 @@
+name: "ZeroClaw Agent"
+description: "ZeroClaw: 极轻量级本地 AI 代理 (基于 Rust 单文件)."
+version: "0.1.0"
+slug: "zeroclaw_agent"
+url: "https://github.com/hew150/zeroclaw-ha-addon"
+arch:
+  - aarch64
+  - amd64
+  - armv7
+  - armhf
+  - i386
+startup: services
+boot: auto
+init: false
+host_network: true
+
+# 将 /config (HA 核心目录) 映射给 ZeroClaw 读写，方便它后续修改 HA 配置
+map:
+  - config:rw
+
+# UI 用户表单默认值
+options:
+  provider: "anthropic"
+  api_key: ""
+  port: 8080
+  debug_mode: false
+
+# 严格的 Supervisor 语法校验
+schema:
+  provider: "list(anthropic|openai|groq|local)"
+  api_key: "password?"   # 带 ? 代表非必填，password 意味着密码会被打码
+  port: "port"           # 强制校验为端口数字格式
+  debug_mode: "bool?"    # 注意必须是 bool，带 ? 代表可选
+
+# 开启 HA Ingress (把界面嵌在侧边栏)
+ingress: true
+# 给 Web 终端分配一个固定的容器内部端口
+ingress_port: 8099
+# 侧边栏显示的名称
+panel_title: "ZeroClaw 控制台"
+# 侧边栏显示的图标
+panel_icon: "mdi:console-line"
