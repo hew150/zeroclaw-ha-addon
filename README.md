@@ -1,9 +1,24 @@
-# ZeroClaw Home Assistant Add-on
+# 🦀 ZeroClaw for Home Assistant
 
-这是为 Home Assistant 打造的 ZeroClaw (极轻量级本地 AI 代理) 专属插件仓库。
+![Version](https://img.shields.io/badge/version-v0.1.0-blue)
+![Architecture](https://img.shields.io/badge/arch-aarch64%20%7C%20amd64-green)
+![RAM](https://img.shields.io/badge/RAM_Usage-<10MB-brightgreen)
 
-## 安装方法
-1. 在 Home Assistant 中进入 **设置** -> **加载项** -> **加载项商店**。
-2. 点击右上角的三个点，选择 **仓库**。
-3. 添加此 GitHub 仓库的 URL。
-4. 刷新页面，搜索 `ZeroClaw` 并安装。
+这是为 [Home Assistant](https://www.home-assistant.io/) 打造的 **ZeroClaw** 专属非官方插件仓库。
+
+ZeroClaw 是一个基于 Rust 编写的极轻量级、高性能本地 AI 代理引擎。通过本插件，你可以将极其聪明的 AI 大脑无缝接入你的智能家居系统，且几乎不占用任何系统资源。
+
+## ✨ 核心亮点
+* **🚀 极致轻量**：纯 Rust 编译，告别臃肿环境，运行内存通常 **< 10MB**。
+* **💾 持久化记忆**：配置与记忆库均持久化保存在 HA 的 `/config` 目录中，重启不丢失。
+* **🌐 多模型兼容**：支持自定义接入 OpenAI, Claude, Groq，以及科大讯飞 (Xunfei GLM) 等国产模型。
+* **📱 频道集成**：支持在后台静默运行飞书 (Lark)、Telegram 等即时通讯机器人。
+
+## 📦 安装向导
+1. 导航至 Home Assistant 面板的 **设置** -> **附加组件** -> **附加组件商店**。
+2. 点击右上角的三个点 `...`，选择 **仓库**。
+3. 添加本仓库 URL：`https://github.com/hew150/zeroclaw-ha-addon`
+4. 刷新页面，搜索 `ZeroClaw Agent` 并安装。
+
+## 🤝 上游项目
+了解更多 ZeroClaw 官方动态，请访问原始仓库：[zeroclaw-labs/zeroclaw](https://github.com/zeroclaw-labs/zeroclaw)
