@@ -79,12 +79,11 @@ else
 fi
 
 # ==========================================
-# 4. 后台引擎三开与优雅停机 (兼容小白的工业级防御)
+# 4. 后台引擎启动 (完全体 Daemon 模式)
 # ==========================================
 shutdown() {
   echo "INFO: Shutdown requested..."
-  kill -TERM "$GW_PID" 2>/dev/null || true
-  [ -n "${CHAN_PID:-}" ] && kill -TERM "$CHAN_PID" 2>/dev/null || true
+  kill -TERM "$DAEMON_PID" 2>/dev/null || true
   kill -TERM "$TTYD_PID" 2>/dev/null || true
   wait 2>/dev/null || true
   exit 0
@@ -93,23 +92,17 @@ trap shutdown INT TERM
 
 cd "$ZEROCLAW_WORKSPACE_DIR"
 
-echo "🚀 Starting ZeroClaw Gateway on port ${PORT}..."
-/usr/bin/zeroclaw gateway --port "${PORT}" &
-GW_PID=$!
-
 echo "💻 Starting Web Terminal (ttyd) on port 8099..."
 ttyd -W -p 8099 bash &
 TTYD_PID=$!
 
-# 🌟 核心魔法：智能探测是否需要启动频道引擎
-if grep -q "\[channels_config" "$CONFIG_FILE"; then
-    echo "📡 Custom channels detected in config. Starting ZeroClaw Channels..."
-    /usr/bin/zeroclaw channel start &
-    CHAN_PID=$!
-    # 你是极客，守护所有进程
-    wait -n "$GW_PID" "$CHAN_PID" "$TTYD_PID"
-else
-    echo "📡 No custom channels configured. Running in Gateway-only mode."
-    # 别人是普通用户，只守护网关和终端，防止频道报错拉闸
-    wait -n "$GW_PID" "$TTYD_PID"
-fi
+# 🌟 核心升级：使用 daemon 模式。
+# 它会自动拉起网关、频道和定时任务。
+# 注意：一定要确保你的 build.yml 已经加上了 --all-features，
+# 否则 daemon 发现配置了频道却找不到功能模块会直接报错退出。
+echo "👹 Starting ZeroClaw Daemon (Gateway + Channels + Cron)..."
+/usr/bin/zeroclaw daemon &
+DAEMON_PID=$!
+
+# 守护进程，任何一个退出则容器重启
+wait -n "$DAEMON_PID" "$TTYD_PID"
