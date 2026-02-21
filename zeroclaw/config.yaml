@@ -1,6 +1,6 @@
 name: "ZeroClaw Agent"
 description: "ZeroClaw: 极轻量级本地 AI 代理 (基于 Rust 单文件)."
-version: "0.1.1-manual.b10"
+version: "0.1.1-manual.b11"
 slug: "zeroclaw_agent"
 url: "https://github.com/hew150/zeroclaw-ha-addon"
 arch:
