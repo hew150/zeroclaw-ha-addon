@@ -1,6 +1,6 @@
 # 🦀 ZeroClaw for Home Assistant
 
-![Version](https://img.shields.io/badge/version-v0.1.0-blue)
+![Version](https://img.shields.io/badge/version-v0.1.6-blue)
 ![Architecture](https://img.shields.io/badge/arch-aarch64%20%7C%20amd64-green)
 ![RAM](https://img.shields.io/badge/RAM_Usage-<10MB-brightgreen)
 
